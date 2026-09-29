@@ -365,6 +365,27 @@ de vijand kan achter een muur blijven hangen; dat is voor nu acceptabel en past 
 
 ---
 
+### B21 — Determinismetest: FNV-1a over alle velden (beslist bij M4)
+
+**Beslissing:** `hash(const State&)` is FNV-1a (64 bit) over álle velden van `State`
+(afmetingen, tegels, posities, HP, beurt, RNG-state). Elk geheel getal gaat als vaste
+little-endian bytes erin. De test speelt een vaste kaart met acties uit een aparte
+RNG-stroom en vergelijkt (a) twee runs onderling over 100 seeds en (b) één run met een
+vastgelegde golden waarde.
+
+**Waarom:** byte voor byte hashen (niet `memcpy` van de struct) maakt de hash
+onafhankelijk van padding en endianness. Acties uit een aparte RNG zorgen dat de test
+niet meedraait op de RNG die hij test. Niet-cryptografisch is genoeg: we willen
+regressies vangen, geen aanvallers.
+
+**Let op:** de golden waarde bewijst geen correctheid, alleen dat het gedrag niet
+onbedoeld verandert. Hij verandert bij elke wijziging aan regels, RNG-gebruik, `State`
+of hash — dan bewust bijwerken en de reden in de devlog zetten. De huidige golden-run
+eindigt met `Lost` op beurt 34; gebruik later ook een run die het doel haalt als de
+regels uitbreiden.
+
+---
+
 ## Nog open
 
 ### ~~O1 — Implementatietaal~~ → beslist, zie B10

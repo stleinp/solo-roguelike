@@ -6,6 +6,25 @@ stilstand zonder aanloop verder kunnen, en expliciteren wat je geleerd hebt.
 
 ---
 
+## 29 september 2026 (sessie 2, vervolg) — M4 determinismetest af
+
+**Gedaan**
+- `src/sim/hash.hpp/.cpp`: FNV-1a over alle `State`-velden (B21).
+- `tests/test_determinism.cpp`: 100 seeds twee keer gespeeld en vergeleken; andere seed
+  of andere acties geeft andere hash; hash reageert op elk veld; golden waarde
+  `0x19936cd070a5f202` (seed 12345, actieseed 67890, 200 stappen).
+- 34 tests groen in Debug (ASan/UBSan); de golden klopt ook in Release, dus de uitkomst
+  hangt niet af van optimalisatie.
+
+**Geleerd / onthouden**
+- De golden waarde heb ik uit de huidige implementatie gehaald: hij vangt regressies,
+  niet fouten. De run eindigt in `Lost` op beurt 34.
+- Acties uit een aparte RNG-stroom houden de test onafhankelijk van de game-RNG.
+
+**Volgende:** M5 — `bench` in Release, steps/seconde in de devlog.
+
+---
+
 ## 29 september 2026 (sessie 2, vervolg) — M3 RNG en vijand af
 
 **Gedaan**
