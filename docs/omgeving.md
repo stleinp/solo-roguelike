@@ -119,7 +119,7 @@ ctest --preset debug
 # Release: voor de benchmark (steps/s altijd in Release meten)
 cmake --preset release
 cmake --build --preset release
-./build/release/tools/bench/bench   # vanaf M5
+./build/release/tools/bench/bench [episodes]
 ```
 
 `build/` staat in `.gitignore`.

@@ -25,9 +25,9 @@ een educatieve master — het doel is leren en technisch scherp blijven, niet om
 
 ## Status
 
-- **Fase 0 (planning), M0 t/m M4 (determinismetest): afgerond.** Toolchain
+- **Fase 0 (planning), **Fase 1 (M0 t/m M5): afgerond.**** Toolchain
   aanwezig; `cmake --preset debug && cmake --build --preset debug && ctest --preset debug`.
-- **Volgende stap: M5 — benchmark.** Zie `docs/projectplan.md` (sectie "Mijlpalen fase 1").
+- **Volgende stap: fase 2 — speelbaar maken**, te beginnen met beslissing O3 (rendering). Zie `docs/projectplan.md` (sectie "Mijlpalen fase 1").
 - Laatste stand altijd in `docs/devlog.md` (nieuwste bovenaan).
 
 ## Omgeving

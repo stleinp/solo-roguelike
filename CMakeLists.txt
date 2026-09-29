@@ -17,6 +17,7 @@ target_link_options(delve_options INTERFACE
     $<$<CONFIG:Debug>:-fsanitize=address,undefined>)
 
 add_subdirectory(src/sim)
+add_subdirectory(tools/bench)
 
 include(CTest)
 if(BUILD_TESTING)

@@ -42,9 +42,9 @@ losse projecten — het één volgt uit het ander.
 
 ## Status
 
-**Fase 1 — M0 t/m M4 afgerond.** `sim` bevat `State`, `parse_map`, `step()`, eigen RNG,
-een vijand en een state-hash; determinismetest met golden waarde slaagt in Debug
-(ASan/UBSan) en Release. Volgende: M5 (benchmark).
+**Fase 1 afgerond (M0 t/m M5).** Deterministische headless kern met `step()`, eigen RNG,
+vijand, state-hash, determinismetest en benchmark (~49 miljoen steps/s, Release,
+één thread). Volgende: fase 2, speelbaar maken.
 RL-stack beslist pas in fase 3.
 
 ## Documentatie
@@ -68,7 +68,7 @@ gooien; deze niet.
 
 ## Volgende stap
 
-Fase 1, mijlpaal **M5 — benchmark** (Release-build). Zie
+Fase 2 — speelbaar maken; begin met O3 (rendering) te beslissen. Zie
 [`projectplan.md`](projectplan.md#fase-1--deterministische-headless-kern).
 
 ## Werkregels

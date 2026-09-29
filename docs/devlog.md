@@ -6,6 +6,33 @@ stilstand zonder aanloop verder kunnen, en expliciteren wat je geleerd hebt.
 
 ---
 
+## 29 september 2026 (sessie 2, vervolg) — M5 benchmark af, fase 1 klaar
+
+**Gedaan**
+- `tools/bench/main.cpp`: speelt willekeurige episodes op de vaste 11×7-kaart (elke
+  episode een eigen seed), telt uitkomsten en stappen en print steps/s plus een checksum
+  (XOR van de eindhashes). Waarschuwt in een build zonder `NDEBUG`.
+- Meting (Release, g++ 13.3, één thread, 200.000 episodes, 3 runs):
+  **~49 miljoen steps/s** (49,1–49,3 M); ~11,8 stappen per episode.
+  Uitkomsten: 0,7 % gewonnen, 55 % verloren, 44 % timeout.
+- Checksum is identiek bij elke run: ook de benchmark is deterministisch.
+
+**Geleerd / onthouden**
+- Fase 3 wordt door de simulatie niet beperkt: 49 M steps/s is ver boven de
+  500.000 uit het projectplan. Het knelpunt wordt de taalgrens en de training.
+- "Reset" is hier een kopie van de initiële `State` (één `vector`-allocatie); als dat
+  ooit zwaar weegt, is een reset-in-place mogelijk. Nu niet nodig.
+- Het getal is een startpunt. Het gebruik van een willekeurige policy maakt episodes
+  kort; een slimmere agent speelt langere episodes met andere kosten per stap.
+- De eerste meting van 0,05 s was te kort; 200.000 episodes geeft stabielere getallen.
+
+**Fase 1 is klaar** volgens de criteria: duizenden willekeurige episodes zonder
+rendering, determinismetest slaagt, en er is een getal voor throughput.
+
+**Volgende:** fase 2 — beslis O3 (rendering) en maak het speelbaar.
+
+---
+
 ## 29 september 2026 (sessie 2, vervolg) — M4 determinismetest af
 
 **Gedaan**
