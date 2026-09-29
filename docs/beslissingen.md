@@ -323,6 +323,29 @@ uitgebreid.
 
 ---
 
+### B19 — Spelregels van `step()` (beslist bij M2)
+
+**Beslissing:**
+- Volgorde per beurt: speler, dan vijand (als die leeft), dan `turn++`.
+- Tegen een muur of buiten het grid lopen doet niets, maar kost wel een beurt.
+- Bewegen in de levende vijand = aanvallen (schade 1, vijand-HP 3); een dode vijand
+  blokkeert niet meer.
+- Op het doel stappen = direct `Won`; de vijand doet dan niets meer.
+- Een vijand naast de speler slaat (schade 1, speler-HP 10). Bewegen van de vijand
+  komt in M3.
+- Einde: `Won`, `Lost` (speler-HP ≤ 0) of `Timeout` (200 beurten). `Lost` gaat voor
+  `Won`, en die voor `Timeout`.
+- De uitkomst wordt afgeleid uit de `State` (`outcome_of`), er is geen aparte
+  "klaar"-vlag. `step()` op een afgelopen episode verandert niets.
+
+**Waarom:** een geblokkeerde zet die gratis is, laat de agent zonder straf tegen muren
+lopen; kosten per beurt houden het gedrag eerlijk. Een timeout is nodig voor RL
+(episodes moeten eindigen) en voor de benchmark. Uitkomst afleiden uit de state
+voorkomt dat vlag en state uit elkaar lopen. De getallen zijn constanten in
+`step.hpp` en kunnen later bijgesteld worden bij balans.
+
+---
+
 ## Nog open
 
 ### ~~O1 — Implementatietaal~~ → beslist, zie B10

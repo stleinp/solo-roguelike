@@ -6,6 +6,23 @@ stilstand zonder aanloop verder kunnen, en expliciteren wat je geleerd hebt.
 
 ---
 
+## 29 september 2026 (sessie 2, vervolg) — M2 `step()` af
+
+**Gedaan**
+- `src/sim/step.hpp/.cpp`: `StepResult step(State&, Action)`, `Outcome`, `outcome_of`.
+  Regels vastgelegd in B19.
+- 13 nieuwe tests, één of twee per regel (18 in totaal); alles groen met ASan/UBSan.
+- De vijand slaat al als hij naast de speler staat, zodat `Lost` in M2 testbaar is;
+  bewegen en RNG volgen in M3.
+
+**Geleerd / onthouden**
+- Uitkomst afleiden uit de state ipv een vlag bijhouden houdt `State` de enige bron van
+  waarheid, wat later ook de determinismehash (M4) eenvoudiger maakt.
+
+**Volgende:** M3 — eigen RNG en vijandgedrag.
+
+---
+
 ## 29 september 2026 (sessie 2, vervolg) — M1 datamodel af
 
 **Gedaan**

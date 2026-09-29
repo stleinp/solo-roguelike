@@ -4,7 +4,7 @@ FetchContent_Declare(doctest
     GIT_TAG v2.4.11)
 FetchContent_MakeAvailable(doctest)
 
-add_executable(tests main.cpp test_state.cpp)
+add_executable(tests main.cpp test_state.cpp test_step.cpp)
 target_link_libraries(tests PRIVATE sim delve_options doctest::doctest)
 
 list(APPEND CMAKE_MODULE_PATH ${doctest_SOURCE_DIR}/scripts/cmake)

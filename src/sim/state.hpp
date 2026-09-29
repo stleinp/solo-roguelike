@@ -29,6 +29,7 @@ struct State {
     std::array<std::uint64_t, 4> rng_state{};  // filled in by the RNG in M3
 
     Tile tile_at(Pos p) const { return tiles[static_cast<std::size_t>(p.y * width + p.x)]; }
+    bool enemy_alive() const { return enemy_hp > 0; }
     bool in_bounds(Pos p) const { return p.x >= 0 && p.y >= 0 && p.x < width && p.y < height; }
 };
 
