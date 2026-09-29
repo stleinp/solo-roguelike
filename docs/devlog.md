@@ -6,6 +6,25 @@ stilstand zonder aanloop verder kunnen, en expliciteren wat je geleerd hebt.
 
 ---
 
+## 29 september 2026 (sessie 2, vervolg) — M1 datamodel af
+
+**Gedaan**
+- `src/sim/types.hpp` (`Action`, `Tile`, `Pos`), `state.hpp/.cpp` (`State`,
+  `parse_map`). Kaartformaat: `#` muur, `.` vloer, `>` doel, `@` speler, `E` vijand.
+- `parse_map` valideert: rechthoekig, precies één speler en vijand, minstens één doel.
+  Geeft `std::optional<State>`.
+- 5 tests op inlezen en grenzen; alles groen met ASan/UBSan.
+- B18: vijf acties met bump-to-attack.
+
+**Geleerd / onthouden**
+- `rng_state` staat al in `State` als lege array; de echte RNG komt in M3.
+- Foutmeldingen bij ongeldige kaarten zijn bewust weggelaten (`nullopt`); pas toevoegen
+  als het debuggen erom vraagt.
+
+**Volgende:** M2 — `step()`.
+
+---
+
 ## 29 september 2026 (sessie 2) — M0 skelet af
 
 **Gedaan**

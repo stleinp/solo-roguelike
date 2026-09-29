@@ -42,8 +42,8 @@ losse projecten — het één volgt uit het ander.
 
 ## Status
 
-**Fase 1 — M0 (skelet) afgerond.** CMake-project met lege `sim`-library en één
-doctest-test bouwt en slaagt in Debug (ASan/UBSan). Volgende: M1 (datamodel).
+**Fase 1 — M0 en M1 afgerond.** `sim` bevat `State`, `Action`, `Tile` en `parse_map`;
+tests slagen in Debug (ASan/UBSan). Volgende: M2 (`step()`).
 RL-stack beslist pas in fase 3.
 
 ## Documentatie
@@ -67,8 +67,7 @@ gooien; deze niet.
 
 ## Volgende stap
 
-Fase 1, mijlpaal **M1 — datamodel** (`State`, `Action`, `Tile`, map inlezen). Beslis
-daar ook het aantal acties (5 of 6). Zie
+Fase 1, mijlpaal **M2 — `step()`**. Zie
 [`projectplan.md`](projectplan.md#fase-1--deterministische-headless-kern).
 
 ## Werkregels

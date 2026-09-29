@@ -307,6 +307,22 @@ voor de gebruiker zelf en blijft in de moedertaal.
 
 ---
 
+### B18 — Vijf acties: bump-to-attack (beslist bij M1)
+
+**Beslissing:** `Action` = Up, Down, Left, Right, Wait. Bewegen in de vijand is
+aanvallen; er is geen aparte aanvalsactie.
+
+**Waarom:** kleinere actieruimte voor de agent (B7), en het is de gebruikelijke
+roguelike-conventie. Een aparte aanval voegt in een game zonder afstandswapens alleen
+ongeldige acties toe. Dit lost de tegenstrijdigheid tussen projectplan ("vijf acties")
+en B7 ("vier richtingen, aanvallen, wachten") op: B7 is bedoeld als "aanvallen via
+bewegen".
+
+**Gevolg:** als er later afstandsaanvallen of items komen, wordt de actieruimte dan pas
+uitgebreid.
+
+---
+
 ## Nog open
 
 ### ~~O1 — Implementatietaal~~ → beslist, zie B10

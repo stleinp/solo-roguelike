@@ -25,9 +25,9 @@ een educatieve master — het doel is leren en technisch scherp blijven, niet om
 
 ## Status
 
-- **Fase 0 (planning) en M0 (skelet): afgerond** op 29 september 2026. Toolchain
+- **Fase 0 (planning), M0 (skelet) en M1 (datamodel): afgerond.** Toolchain
   aanwezig; `cmake --preset debug && cmake --build --preset debug && ctest --preset debug`.
-- **Volgende stap: M1 — datamodel.** Zie `docs/projectplan.md` (sectie "Mijlpalen fase 1").
+- **Volgende stap: M2 — `step()`.** Zie `docs/projectplan.md` (sectie "Mijlpalen fase 1").
 - Laatste stand altijd in `docs/devlog.md` (nieuwste bovenaan).
 
 ## Omgeving
@@ -76,8 +76,7 @@ Geen Python tot fase 3. Details: `docs/omgeving.md`.
 
 ## Open punten
 
-- **Bij M1:** aantal acties — vijf (vier richtingen + wachten, bump-to-attack) of zes
-  (expliciete aanval). Projectplan en B7 spreken elkaar hier tegen.
+- Vijf acties met bump-to-attack (B18).
 - Code en commentaar zijn Engels, documentatie Nederlands (B17).
 - Nog open volgens planning: O2 RL-stack (begin fase 3), O3 rendering (begin fase 2),
   O4 observatievorm en O5 reward-ontwerp (fase 3), O6 publiek/privé, O7 lesmateriaal.
