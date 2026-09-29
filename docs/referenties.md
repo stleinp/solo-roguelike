@@ -70,11 +70,22 @@ en [O3](beslissingen.md#o3--rendering).
   pattern, component pattern. Kort en praktisch.
 - **raylib** — minimale C-bibliotheek voor window, input en 2D-rendering. Laagdrempelig
   alternatief voor SDL als de terminal niet volstaat.
-- **PyO3** (Rust) of **pybind11** (C++) — voor de binding naar Python in fase 3.
+- **nanobind** of **pybind11** — voor de binding van C++ naar Python in fase 3.
+  nanobind is de modernere, snellere opvolger van dezelfde auteur.
 
-Als de taalkeuze op Rust valt: *The Rust Programming Language* (het gratis boek) en
-daarna meteen aan dit project beginnen. Niet eerst een oefenproject — dit ís het
-oefenproject.
+De taal is C++20 ([B10](beslissingen.md#b10--c20-als-implementatietaal-was-o1)).
+Nuttig daarbij:
+
+- **cppreference.com** — de naslag voor taal en standaardbibliotheek.
+- **C++ Core Guidelines** — om modern C++ te schrijven in plaats van "C met klassen".
+- **doctest** — single-header testframework, gebruikt vanaf M0.
+- **CMake** — de officiële *CMake Tutorial* en "Modern CMake" (cliutils.gitlab.io/modern-cmake):
+  denken in targets en `target_link_libraries`, niet in globale variabelen.
+- **xoshiro / splitmix64** (prng.di.unimi.it) en **PCG** (pcg-random.org) — kleine,
+  snelle, portabele RNG's voor M3. Zie [B14](beslissingen.md) voor waarom niet
+  `<random>`'s distributies.
+
+Geen apart oefenproject vooraf — dit ís het oefenproject.
 
 ---
 

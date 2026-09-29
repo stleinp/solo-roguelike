@@ -1,6 +1,6 @@
 # Projectplan
 
-Status: **fase 0 — planning**
+Status: **fase 0 — planning, afgerond** · volgende: fase 1, mijlpaal M0
 Laatst bijgewerkt: 29 september 2026
 
 ---
@@ -88,6 +88,45 @@ ontwerpprincipe, benchmarking.
 
 **Risico:** de neiging om hier al een "engine" te bouwen. Bouw de simulatie van *deze*
 game, niet een framework.
+
+#### Mijlpalen fase 1
+
+Elke mijlpaal is één à twee avonden werk en eindigt met iets dat compileert en getest is.
+Na een onderbreking van twee weken: kijk in de [devlog](devlog.md) welke mijlpaal
+laatst af was en begin bij de volgende.
+
+| # | Mijlpaal | Klaar wanneer |
+|---|---|---|
+| **M0** | **Skelet** | CMake-project bouwt in WSL met Ninja; lege `sim`-library; één doctest-test slaagt via `ctest`; `.gitignore`, `.gitattributes`, `.clang-format`; warnings aan; Debug-build met ASan/UBSan |
+| **M1** | **Datamodel** | `State` (grid, speler, vijand, HP, beurtteller, RNG-state), `enum class Action`, `enum class Tile`; vaste map ingelezen uit een string; tests op het inlezen |
+| **M2** | **`step()`** | `StepResult step(State&, Action)`: bewegen, muren, aanvallen, doel bereiken, dood, episode-einde; tests per regel |
+| **M3** | **RNG en vijand** | Eigen seeded RNG (splitmix64 + xoshiro256** of PCG, zie [B14](beslissingen.md)); vijand die willekeurig beweegt of de speler achtervolgt |
+| **M4** | **Determinismetest** | Seed + actiereeks → hash van de eindtoestand; twee keer uitgevoerd én vergeleken met een golden waarde |
+| **M5** | **Benchmark** | `bench`-programma draait duizenden willekeurige episodes (Release-build) en print steps/seconde. Getal in de devlog. |
+
+Hulpmiddel, op elk moment: een `to_string(State)` voor debuggen, in een apart bestand
+buiten de kern van `step()`. Dit is nog geen renderer.
+
+**Detail om bij M1 te beslissen — het aantal acties.** De tekst hierboven zegt "vijf
+acties", B7 zegt "vier richtingen, aanvallen, wachten" (= zes). Gebruikelijk in
+roguelikes is *bump-to-attack*: bewegen in een vijand is aanvallen. Dat geeft vijf
+acties (vier richtingen + wachten) en een kleinere actieruimte voor de agent. Kies en
+leg vast in `beslissingen.md`.
+
+#### Voorziene repostructuur
+
+```
+CMakeLists.txt
+src/sim/        → library "sim": spelregels, state, RNG. Geen I/O, linkt tegen niets.
+src/game/       → fase 2: renderer + input + main loop, linkt tegen sim
+tools/bench/    → benchmark (steps/s), linkt tegen sim
+tests/          → doctest-tests, linken tegen sim
+python/         → fase 3: binding + training
+docs/           → documentatie
+```
+
+De afhankelijkheidsrichting (alles → `sim`, nooit omgekeerd) wordt door CMake
+afgedwongen; zie [B12](beslissingen.md).
 
 ---
 
@@ -222,3 +261,7 @@ Waarschuwingssignalen, in volgorde van ernst:
   alleen de uitkomst
 - `README.md` statusregel bijwerken bij elke faseovergang
 - `projectplan.md` herzien na fase 3; de inschattingen daarna zijn het minst betrouwbaar
+- `devlog.md` aanvullen na elke werksessie: wat gedaan, wat geleerd, welke mijlpaal af,
+  gemeten steps/s
+- `CLAUDE.md` (root) bijwerken wanneer status, volgende stap of werkafspraken veranderen,
+  zodat een nieuwe Claude Code-sessie meteen mee is

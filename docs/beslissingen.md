@@ -78,6 +78,8 @@ waarschuwingssignaal in [`projectplan.md`](projectplan.md#4-hoe-je-weet-dat-het-
 logic verweven raakt, kan er in fase 3 niet meer headless getraind worden zonder alles
 te herschrijven. Alle andere keuzes zijn later nog om te gooien.
 
+**Hoe afgedwongen:** via aparte CMake-targets, zie B12.
+
 ---
 
 ### B6 — Deterministisch en seeded vanaf het begin
@@ -88,6 +90,8 @@ komt een test die dat bewijst, in fase 1.
 **Waarom:** reproduceerbare training, bruikbare bugreports, replays, en de mogelijkheid
 om een run exact opnieuw af te spelen. Achteraf determinisme inbouwen is veel duurder
 dan het vanaf het begin afdwingen.
+
+**Concrete regels:** zie B14.
 
 ---
 
@@ -148,9 +152,155 @@ terwijl er al gewicht op de structuur staat.
 
 ---
 
+### B10 — C++20 als implementatietaal (was O1)
+
+**Beslissing:** de simulatie, game en tools worden geschreven in modern C++ (C++20).
+Beslist op 29 september 2026.
+
+**Waarom:** C en C++ zijn de talen die het best gekend zijn. Volgens de werkregel
+"verander één of twee dingen tegelijk" is een vertrouwde taal hier verstandig:
+engine-architectuur, determinisme, performance en RL zijn al nieuw genoeg. De leerwinst
+zit in het domein, niet in de syntax. C++ verkiezen boven C omdat:
+- de Python-binding in fase 3 eenvoudiger is via nanobind of pybind11;
+- `std::vector`, `std::array`, `enum class`, RAII en een standaardbibliotheek de kans
+  op geheugenfouten verkleinen zonder performance te kosten.
+
+**Hoe C++ hier leerzaam blijft:** bewust *modern en data-georiënteerd* schrijven —
+zie B13. Niet het C++ van klassenhiërarchieën en `virtual`.
+
+**Aandachtspunt voor O2:** sommige RL-tooling (PufferLib) ondersteunt native
+environments in C. Een C++-simulatie kan indien nodig een dunne C-API (`extern "C"`)
+aanbieden; dat is geen reden om de hele kern in C te schrijven.
+
+**Verworpen:** Rust (grootste leerwinst, maar nieuwe taal + nieuw domein + nieuwe
+toolchain is te veel tegelijk), C (meer voetangels, geen voordeel dat C++ niet ook
+biedt), Zig (klein ecosysteem).
+
+---
+
+### B11 — Ontwikkelen in WSL2 (Ubuntu 24.04) met VS Code
+
+**Beslissing:** alle ontwikkeling gebeurt in WSL2 (Ubuntu 24.04, al geïnstalleerd), met
+VS Code via de Remote-WSL-extensie. De repo staat in het Linux-bestandssysteem
+(`~/projects/solo-roguelike`), **niet** onder `/mnt/c/...`. Volledige Visual Studio is
+niet nodig. Installatiestappen: zie [`omgeving.md`](omgeving.md).
+
+**Waarom:**
+1. *Fase 3 is op native Windows pijnlijk.* De Windows-Python (Miniconda) is met MSVC
+   gebouwd; een Python-extensie compileren met de aanwezige MinGW-g++ geeft
+   ABI-problemen. Op Windows zou je alsnog de MSVC Build Tools nodig hebben. Op Linux
+   werkt het gewoon.
+2. *RL-tooling is primair op Linux gericht* (PufferLib). CUDA werkt in WSL2 met de
+   RTX 3050.
+3. *Sanitizers* (`-fsanitize=address,undefined`) werken onder Linux, niet onder MinGW.
+   Ze vangen geheugenfouten meteen in plaats van na drie avonden zoeken.
+4. *Terminalrendering* voor fase 2 (ncurses) is op Linux standaard.
+5. De aanwezige Windows-g++ komt mee met Strawberry Perl — een toevallige installatie,
+   geen toolchain om een project op te bouwen.
+6. De repo onder `/mnt/c` zetten maakt builds en git merkbaar trager.
+
+**Verworpen alternatief:** fase 1–2 native op Windows met MinGW en pas in fase 3
+overstappen. Haalbaar, maar dan betaal je de overstap in de zwaarste fase.
+
+---
+
+### B12 — Build en tooling: CMake + Ninja, doctest, sanitizers
+
+**Beslissing:**
+- **Build:** CMake (≥ 3.25) met Ninja als generator. Twee configuraties:
+  `Debug` (met AddressSanitizer + UndefinedBehaviorSanitizer) en `Release` (`-O2`/`-O3`,
+  voor de benchmark).
+- **Compiler:** GCC (g++) in WSL; clang als tweede compiler is welkom.
+- **Warnings:** `-Wall -Wextra -Wpedantic -Wshadow -Wconversion`, zonder ze te negeren.
+- **Tests:** doctest (single header, snel compileren), binnengehaald via CMake
+  `FetchContent`. Uitvoeren met `ctest`.
+- **Formattering:** `.clang-format` in de repo; clangd of de C/C++-extensie in VS Code.
+- **Line endings:** `.gitattributes` met `eol=lf`, zodat Windows- en WSL-checkouts
+  hetzelfde zien.
+
+**B5 afdwingen via de build:** de simulatie is een eigen CMake-library `sim` die tegen
+niets linkt en geen I/O doet (geen `<iostream>`, geen bestanden, geen klok). Game,
+benchmark en tests linken tégen `sim`, nooit omgekeerd. Als rendering in de simulatie
+sluipt, faalt de build — de scheiding hangt dan niet af van discipline.
+
+**Waarom:** standaard, goed ondersteund in VS Code (CMake Tools), en precies genoeg.
+Geen eigen buildsysteem, geen package manager (vcpkg/conan) tot er een echte
+afhankelijkheid is die dat rechtvaardigt.
+
+---
+
+### B13 — Data-georiënteerde codestijl
+
+**Beslissing:** de game state is platte data: structs, `std::array`/`std::vector`,
+`enum class` voor acties en tegeltypes, vrije functies zoals
+`StepResult step(State&, Action)`. Geen entiteitshiërarchie met `virtual`, geen
+heap-objecten per entiteit, geen pointers tussen entiteiten (gebruik indices).
+
+**Waarom:** platte state is triviaal te kopiëren, te resetten, te hashen (determinisme-
+test) en te vergelijken. In fase 3 moeten duizenden states parallel in een batch leven
+en observaties naar een vooraf gealloceerde buffer geschreven worden; dat is met platte
+data vanzelfsprekend en met een objectgraaf een herschrijving.
+
+**Grens:** dit is geen ECS-framework. Zie het waarschuwingssignaal "de engine wordt
+algemeen" in het projectplan.
+
+---
+
+### B14 — Concrete determinismeregels (invulling van B6)
+
+**Beslissing:** in de `sim`-library gelden deze regels:
+1. **Eigen RNG**, niet `<random>`'s distributies. `std::uniform_int_distribution` en
+   verwanten zijn implementatie-afhankelijk: dezelfde seed geeft op een andere compiler
+   of standaardbibliotheek andere getallen. Gebruik een eigen kleine generator
+   (splitmix64 voor seeding, xoshiro256** of PCG voor de stroom) en een eigen
+   `range(n)`-functie. De RNG-state zit ín de `State`, zodat kopiëren en herspelen
+   exact werkt.
+2. **Geen iteratie over ongeordende containers** (`std::unordered_map`/`_set`) waar de
+   volgorde het resultaat beïnvloedt.
+3. **Geen klok, geen tijd, geen globale of statische veranderlijke state.**
+4. **Geen floats in de spellogica.** Alles op het grid is integer. (Floats mogen later in
+   observaties voor de agent, buiten de spelregels.)
+5. **Geen pointers of adressen als sleutel of sorteercriterium.**
+6. **Vaste verwerkingsvolgorde** van entiteiten per beurt (bv. speler eerst, dan
+   vijanden op index).
+
+**Test:** seed + vaste actiereeks → hash van de eindtoestand, twee keer uitgevoerd én
+vergeleken met een vastgelegde "golden" waarde. De golden waarde verandert alleen bewust,
+met een devlog-notitie waarom.
+
+---
+
+### B15 — Python pas vanaf fase 3
+
+**Beslissing:** fase 1 en 2 zijn puur C++. Er komt geen Python-omgeving tot fase 3.
+Dan: één omgeving per project, ín WSL (Miniforge/conda of `uv`), vastgelegd in de repo
+(`environment.yml` of `pyproject.toml`). De bestaande Windows-Miniconda is vanuit WSL
+niet bruikbaar, en dat hoeft ook niet.
+
+**Waarom:** nu Python erbij halen is twee onbekenden tegelijk debuggen — waarschuwings-
+signaal 3 in het projectplan. De keuze conda vs. `uv` hangt af van de RL-stack (O2) en
+wordt dan gemaakt.
+
+---
+
+### B16 — Wat "MVP" betekent in dit project
+
+**Beslissing:** twee lagen.
+- **MVP van de game** = einde fase 2: iemand anders kan het opstarten en spelen zonder
+  uitleg.
+- **MVP van het projectidee** = einde fase 3: een getrainde agent haalt op een vaste map
+  betrouwbaar het doel, meetbaar beter dan willekeurig.
+
+**Waarom:** "MVP" zonder definitie wordt een bewegend doel. Nu wordt er uitsluitend aan
+fase 1 gewerkt, in kleine mijlpalen (M0–M5, zie projectplan).
+
+---
+
 ## Nog open
 
-### O1 — Implementatietaal
+### ~~O1 — Implementatietaal~~ → beslist, zie B10
+
+Oorspronkelijke afweging, bewaard als context:
 
 **Kandidaten:** Rust, C, C++, Zig.
 
@@ -166,7 +316,7 @@ terwijl er al gewicht op de structuur staat.
 domein kan. Daar C nog bij nemen omdat de RL-bibliotheek dat prettig vindt, is een
 verandering te veel.
 
-**Te beslissen:** vóór fase 1.
+**Beslist:** 29 september 2026 → C++20 ([B10](#b10--c20-als-implementatietaal-was-o1)).
 
 ---
 

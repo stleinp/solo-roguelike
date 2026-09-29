@@ -1,0 +1,44 @@
+# Devlog
+
+Na elke werksessie een korte notitie: wat gedaan, wat geleerd, welke mijlpaal af, en —
+vanaf M5 — het gemeten aantal steps/seconde. Nieuwste bovenaan. Doel: na twee weken
+stilstand zonder aanloop verder kunnen, en expliciteren wat je geleerd hebt.
+
+---
+
+## 29 september 2026 — Planning afgerond, taal en omgeving gekozen
+
+**Gedaan**
+- Brainstorm uitgewerkt tot projectplan, beslissingslogboek, brainstormverslag en
+  leeslijst.
+- Documentatie verplaatst naar `docs/`; links in de README rechtgezet.
+- Taal gekozen: **C++20** ([B10](beslissingen.md#b10--c20-als-implementatietaal-was-o1)).
+  C en C++ zijn het best gekend; nieuwe taal + nieuw domein + nieuwe toolchain zou te
+  veel tegelijk zijn.
+- Omgeving gekozen: **WSL2 Ubuntu 24.04 + VS Code** (B11), met **CMake + Ninja,
+  doctest, sanitizers** (B12). Doorslaggevend: de Python-binding in fase 3 en
+  RL-tooling werken op Linux zonder gedoe; op Windows botst MinGW met de MSVC-Python.
+- Codestijl (B13), determinismeregels (B14), "Python pas vanaf fase 3" (B15) en de
+  MVP-definitie (B16) vastgelegd.
+- Fase 1 opgedeeld in mijlpalen M0–M5 (zie projectplan).
+- `CLAUDE.md` en `docs/omgeving.md` toegevoegd zodat een nieuwe sessie in WSL meteen
+  mee is.
+
+**Geleerd / onthouden**
+- `std::uniform_int_distribution` is niet portabel deterministisch — dezelfde seed kan
+  per standaardbibliotheek andere getallen geven. Eigen RNG schrijven.
+- Een Python-extensie bouwen met MinGW tegen een MSVC-gebouwde Python geeft
+  ABI-problemen. Nog een reden voor Linux.
+- De scheiding sim/render (B5) kun je laten afdwingen door de build: `sim` als eigen
+  CMake-library die tegen niets linkt.
+
+**Losse eindjes** (zie ook `CLAUDE.md`)
+- Aantal acties vastleggen bij M1: vijf (bump-to-attack) of zes (expliciete aanval).
+- B2 noemt "real-time loops" en "performance onder een frame budget" als leerwinst,
+  terwijl real-time buiten scope valt; de echte performance-uitdaging hier is
+  simulatie-throughput. Formulering eventueel aanpassen.
+- In `brainstorm.md` verwijst de bron voor het UGent@Work-planlastonderzoek naar een
+  partijwebsite in plaats van naar het onderzoek zelf. Alleen relevant als het
+  edtech-idee ooit terugkomt.
+
+**Volgende sessie:** repo klonen in WSL, toolchain installeren (`omgeving.md`), dan M0.

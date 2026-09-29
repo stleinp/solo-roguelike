@@ -15,7 +15,7 @@ inhoudelijk elders ligt, en daarbij bewust dingen leren die buiten de comfortzon
 een gewone applicatiestack vallen.
 
 Commerciële kansen zijn meegenomen als ze zich voordoen, maar er wordt **niet** naar
-ontworpen. Zie [`docs/brainstorm.md`](docs/brainstorm.md) voor hoe die keuze tot stand kwam.
+ontworpen. Zie [`brainstorm.md`](brainstorm.md) voor hoe die keuze tot stand kwam.
 
 ## De kernidee in één alinea
 
@@ -37,21 +37,25 @@ losse projecten — het één volgt uit het ander.
 
 - Geen algemene, herbruikbare engine. Dit is *deze game's* engine.
 - Geen real-time actie, geen 3D, geen fog of war in de eerste versies.
-- Geen RL-getrainde vijanden als fundament. Zie [beslissing B8](docs/beslissingen.md).
+- Geen RL-getrainde vijanden als fundament. Zie [beslissing B8](beslissingen.md#b8--agents-zijn-meetinstrument-geen-tegenstander).
 - Geen commercieel product.
 
 ## Status
 
-**Fase 0 — planning.** Nog geen code. Taalkeuze en RL-stack staan nog open.
+**Fase 0 — planning, afgerond.** Nog geen code. Taal (C++20) en ontwikkelomgeving
+(WSL2 + VS Code, CMake) liggen vast. RL-stack beslist pas in fase 3.
 
 ## Documentatie
 
 | Document | Inhoud |
 |---|---|
-| [`docs/projectplan.md`](docs/projectplan.md) | Gefaseerd plan, mijlpalen, afbakening, risico's |
-| [`docs/beslissingen.md`](docs/beslissingen.md) | Beslissingslogboek: wat vastligt, wat open is, en waarom |
-| [`docs/brainstorm.md`](docs/brainstorm.md) | Achtergrond: welke richtingen overwogen zijn en waarom ze afvielen |
-| [`docs/referenties.md`](docs/referenties.md) | Leeslijst en tooling |
+| [`projectplan.md`](projectplan.md) | Gefaseerd plan, mijlpalen (incl. M0–M5 van fase 1), afbakening, risico's |
+| [`beslissingen.md`](beslissingen.md) | Beslissingslogboek: wat vastligt, wat open is, en waarom |
+| [`omgeving.md`](omgeving.md) | Ontwikkelomgeving: WSL2, toolchain, VS Code, Python later |
+| [`devlog.md`](devlog.md) | Devlog: wat er per sessie gedaan en geleerd is |
+| [`brainstorm.md`](brainstorm.md) | Achtergrond: welke richtingen overwogen zijn en waarom ze afvielen |
+| [`referenties.md`](referenties.md) | Leeslijst en tooling |
+| [`../CLAUDE.md`](../CLAUDE.md) | Context voor Claude Code-sessies |
 
 ## De enige architectuurbeslissing die nu al goed moet
 
@@ -62,8 +66,9 @@ gooien; deze niet.
 
 ## Volgende stap
 
-Taalkeuze maken (zie [open vraag O1](docs/beslissingen.md#o1--implementatietaal)) en
-fase 1 uit het projectplan starten.
+1. Repo klonen in WSL en de toolchain installeren — zie [`omgeving.md`](omgeving.md).
+2. Fase 1, mijlpaal **M0 — skelet**: CMake-project, `sim`-library, eerste test.
+   Zie [`projectplan.md`](projectplan.md#fase-1--deterministische-headless-kern).
 
 ## Werkregels
 
