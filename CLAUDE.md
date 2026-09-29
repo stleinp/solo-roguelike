@@ -25,16 +25,14 @@ een educatieve master — het doel is leren en technisch scherp blijven, niet om
 
 ## Status
 
-- **Fase 0 (planning): afgerond** op 29 september 2026. Nog geen code.
-- **Volgende stap: fase 1, mijlpaal M0 — skelet.** Zie `docs/projectplan.md`
-  (sectie "Mijlpalen fase 1").
-- Eerst nagaan of de toolchain in WSL geïnstalleerd is (`docs/omgeving.md`); zo niet,
-  de gebruiker daar doorheen helpen.
+- **Fase 0 (planning) en M0 (skelet): afgerond** op 29 september 2026. Toolchain
+  aanwezig; `cmake --preset debug && cmake --build --preset debug && ctest --preset debug`.
+- **Volgende stap: M1 — datamodel.** Zie `docs/projectplan.md` (sectie "Mijlpalen fase 1").
 - Laatste stand altijd in `docs/devlog.md` (nieuwste bovenaan).
 
 ## Omgeving
 
-WSL2 Ubuntu 24.04, repo in `~/projects/solo-roguelike`, VS Code via Remote-WSL.
+WSL2 Ubuntu 24.04, repo in `~/solo-roguelike`, VS Code via Remote-WSL.
 C++20, CMake + Ninja, g++, doctest via FetchContent, ASan/UBSan in Debug.
 Geen Python tot fase 3. Details: `docs/omgeving.md`.
 
@@ -80,8 +78,7 @@ Geen Python tot fase 3. Details: `docs/omgeving.md`.
 
 - **Bij M1:** aantal acties — vijf (vier richtingen + wachten, bump-to-attack) of zes
   (expliciete aanval). Projectplan en B7 spreken elkaar hier tegen.
-- **Bij M0:** taal van code en commentaar (voorstel: identifiers en commentaar in het
-  Engels, documentatie in het Nederlands) — bevestigen met de gebruiker.
+- Code en commentaar zijn Engels, documentatie Nederlands (B17).
 - Nog open volgens planning: O2 RL-stack (begin fase 3), O3 rendering (begin fase 2),
   O4 observatievorm en O5 reward-ontwerp (fase 3), O6 publiek/privé, O7 lesmateriaal.
 - Klein: formulering B2 ("real-time loops", "frame budget") past niet bij de turn-based

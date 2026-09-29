@@ -296,6 +296,17 @@ fase 1 gewerkt, in kleine mijlpalen (M0–M5, zie projectplan).
 
 ---
 
+### B17 — Taal van code en commentaar: Engels (was open punt bij M0)
+
+**Beslissing:** identifiers en commentaar in de code zijn Engels; documentatie en
+devlog blijven Nederlands.
+
+**Waarom:** de C++-standaardbibliotheek, doctest, en later Python/RL-tooling zijn
+Engelstalig; gemengde namen (`step` naast `beurtTeller`) lezen slecht. Documentatie is
+voor de gebruiker zelf en blijft in de moedertaal.
+
+---
+
 ## Nog open
 
 ### ~~O1 — Implementatietaal~~ → beslist, zie B10

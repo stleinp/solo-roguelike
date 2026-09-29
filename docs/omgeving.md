@@ -63,7 +63,7 @@ gh auth login          # kies GitHub.com, HTTPS, login via browser
 ### 3. Repo klonen — in het Linux-bestandssysteem
 
 ```bash
-mkdir -p ~/projects && cd ~/projects
+cd ~
 git clone https://github.com/stleinp/solo-roguelike.git
 cd solo-roguelike
 ```
@@ -97,7 +97,7 @@ extensiepaneel: "Install in WSL: Ubuntu-24.04"):
 
 ```bash
 curl -fsSL https://claude.ai/install.sh | bash
-cd ~/projects/solo-roguelike
+cd ~/solo-roguelike
 claude
 ```
 
@@ -108,19 +108,18 @@ context om meteen verder te kunnen.
 
 ## Dagelijks gebruik (vanaf M0)
 
-De exacte commando's komen bij M0 vast te liggen, vermoedelijk via `CMakePresets.json`.
-Verwachte vorm:
+Via `CMakePresets.json`:
 
 ```bash
 # Debug: met sanitizers, voor ontwikkelen en tests
-cmake -S . -B build/debug -G Ninja -DCMAKE_BUILD_TYPE=Debug
-cmake --build build/debug
-ctest --test-dir build/debug --output-on-failure
+cmake --preset debug
+cmake --build --preset debug
+ctest --preset debug
 
 # Release: voor de benchmark (steps/s altijd in Release meten)
-cmake -S . -B build/release -G Ninja -DCMAKE_BUILD_TYPE=Release
-cmake --build build/release
-./build/release/tools/bench/bench
+cmake --preset release
+cmake --build --preset release
+./build/release/tools/bench/bench   # vanaf M5
 ```
 
 `build/` staat in `.gitignore`.

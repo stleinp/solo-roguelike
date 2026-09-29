@@ -42,8 +42,9 @@ losse projecten — het één volgt uit het ander.
 
 ## Status
 
-**Fase 0 — planning, afgerond.** Nog geen code. Taal (C++20) en ontwikkelomgeving
-(WSL2 + VS Code, CMake) liggen vast. RL-stack beslist pas in fase 3.
+**Fase 1 — M0 (skelet) afgerond.** CMake-project met lege `sim`-library en één
+doctest-test bouwt en slaagt in Debug (ASan/UBSan). Volgende: M1 (datamodel).
+RL-stack beslist pas in fase 3.
 
 ## Documentatie
 
@@ -66,9 +67,9 @@ gooien; deze niet.
 
 ## Volgende stap
 
-1. Repo klonen in WSL en de toolchain installeren — zie [`omgeving.md`](omgeving.md).
-2. Fase 1, mijlpaal **M0 — skelet**: CMake-project, `sim`-library, eerste test.
-   Zie [`projectplan.md`](projectplan.md#fase-1--deterministische-headless-kern).
+Fase 1, mijlpaal **M1 — datamodel** (`State`, `Action`, `Tile`, map inlezen). Beslis
+daar ook het aantal acties (5 of 6). Zie
+[`projectplan.md`](projectplan.md#fase-1--deterministische-headless-kern).
 
 ## Werkregels
 

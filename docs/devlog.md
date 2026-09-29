@@ -6,6 +6,27 @@ stilstand zonder aanloop verder kunnen, en expliciteren wat je geleerd hebt.
 
 ---
 
+## 29 september 2026 (sessie 2) — M0 skelet af
+
+**Gedaan**
+- Toolchain gecontroleerd; `ninja-build` en `clang-format` bijgeïnstalleerd.
+- Skelet: `CMakeLists.txt`, `CMakePresets.json` (debug/release), `src/sim/` (lege
+  library met placeholder `sim::version()`), `tests/` met doctest via FetchContent,
+  `.gitignore`, `.clang-format`. Warnings aan; ASan/UBSan alleen in Debug, via een
+  `delve_options` interface-library zodat doctest niet aan onze warnings hoeft te voldoen.
+- Debug + Release bouwen; `ctest` slaagt (1/1).
+- B17 vastgelegd: code Engels, docs Nederlands. Paden in docs rechtgezet
+  (`~/solo-roguelike`).
+
+**Geleerd**
+- `sim` linkt niets en de opties zijn `PRIVATE`: consumenten erven geen sanitizers
+  via `sim`, maar linken ze zelf via `delve_options`. Beide kanten moeten dezelfde
+  sanitizers hebben, anders klopt het niet.
+
+**Volgende:** M1 — datamodel; beslis 5 of 6 acties.
+
+---
+
 ## 29 september 2026 — Planning afgerond, taal en omgeving gekozen
 
 **Gedaan**
