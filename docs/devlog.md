@@ -6,6 +6,26 @@ stilstand zonder aanloop verder kunnen, en expliciteren wat je geleerd hebt.
 
 ---
 
+## 29 september 2026 (sessie 2, vervolg) — M3 RNG en vijand af
+
+**Gedaan**
+- `src/sim/rng.hpp/.cpp`: splitmix64, xoshiro256**, `range(n)` zonder bias. Seed via
+  `parse_map(text, seed)`. Beslissingen in B20.
+- Vijand achtervolgt of dwaalt (1 op 4), slaat als hij naast de speler staat.
+- 11 nieuwe tests (29 in totaal): RNG (referentiewaarde splitmix64, uniformiteit,
+  replay van een gekopieerde state) en vijand (invarianten over 50 seeds, corridor,
+  zelfde seed = zelfde spel, andere seed = ander pad). Groen met ASan/UBSan.
+
+**Geleerd / onthouden**
+- Rejection sampling: de eerste `2^64 mod n` waarden weggooien geeft een exact uniforme
+  `range`; `(0 - n) % n` in unsigned rekenen is die drempel.
+- De vijand kan achter een muur blijven vastzitten (geen pathfinding). Bewust; kijk er
+  opnieuw naar als de agent er last van krijgt.
+
+**Volgende:** M4 — hash van de eindtoestand en golden-waarde.
+
+---
+
 ## 29 september 2026 (sessie 2, vervolg) — M2 `step()` af
 
 **Gedaan**

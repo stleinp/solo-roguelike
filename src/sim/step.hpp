@@ -8,6 +8,8 @@ namespace sim {
 inline constexpr int kPlayerDamage = 1;
 inline constexpr int kEnemyDamage = 1;
 inline constexpr int kMaxTurns = 200;
+// Chance that a non-adjacent enemy wanders randomly instead of chasing: 1 in this many.
+inline constexpr std::uint32_t kEnemyWanderOdds = 4;
 
 enum class Outcome : std::uint8_t { Ongoing, Won, Lost, Timeout };
 
@@ -25,7 +27,9 @@ Outcome outcome_of(const State& s);
 //   - Moving into a wall or off the grid does nothing, but the turn is spent.
 //   - Moving into the living enemy attacks it instead of moving (bump-to-attack).
 //   - Stepping on the goal ends the episode at once (Won); the enemy does not act.
-//   - An enemy next to the player hits it. (Enemy movement arrives in M3.)
+//   - An enemy next to the player hits it. Otherwise it usually steps towards the player
+//     and sometimes (1 in kEnemyWanderOdds) in a random direction. It never enters walls,
+//     the player's tile or a goal tile; a blocked move means it stays put.
 //   - The episode ends on Won, Lost (player hp <= 0) or Timeout (kMaxTurns).
 // Calling step on a finished episode changes nothing and returns its outcome.
 StepResult step(State& s, Action a);

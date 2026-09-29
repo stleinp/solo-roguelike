@@ -4,8 +4,9 @@
 
 namespace sim {
 
-std::optional<State> parse_map(std::string_view text) {
+std::optional<State> parse_map(std::string_view text, std::uint64_t seed) {
     State s;
+    s.rng_state = make_rng(seed);
     int players = 0;
     int enemies = 0;
     int goals = 0;

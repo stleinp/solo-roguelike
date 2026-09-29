@@ -331,8 +331,7 @@ uitgebreid.
 - Bewegen in de levende vijand = aanvallen (schade 1, vijand-HP 3); een dode vijand
   blokkeert niet meer.
 - Op het doel stappen = direct `Won`; de vijand doet dan niets meer.
-- Een vijand naast de speler slaat (schade 1, speler-HP 10). Bewegen van de vijand
-  komt in M3.
+- Een vijand naast de speler slaat (schade 1, speler-HP 10); zie B20 voor bewegen.
 - Einde: `Won`, `Lost` (speler-HP ≤ 0) of `Timeout` (200 beurten). `Lost` gaat voor
   `Won`, en die voor `Timeout`.
 - De uitkomst wordt afgeleid uit de `State` (`outcome_of`), er is geen aparte
@@ -343,6 +342,26 @@ lopen; kosten per beurt houden het gedrag eerlijk. Een timeout is nodig voor RL
 (episodes moeten eindigen) en voor de benchmark. Uitkomst afleiden uit de state
 voorkomt dat vlag en state uit elkaar lopen. De getallen zijn constanten in
 `step.hpp` en kunnen later bijgesteld worden bij balans.
+
+---
+
+### B20 — RNG en vijandgedrag (beslist bij M3)
+
+**Beslissing:**
+- RNG: xoshiro256** met splitmix64-seeding, eigen `range(n)` met rejection sampling
+  (geen modulo-bias). De state (`RngState`, 4×`uint64_t`) zit in `State`. De seed komt
+  binnen via `parse_map(text, seed)`.
+- Vijand per beurt: naast de speler → slaan. Anders in 1 op 4 gevallen een willekeurige
+  richting, anders een stap richting de speler (grootste afstandsas eerst, x bij
+  gelijkspel; is die geblokkeerd, dan de andere as). Een geblokkeerde zet = blijven staan.
+- De vijand betreedt geen muren, geen doeltegel en niet de tegel van de speler.
+
+**Waarom:** een mix van achtervolgen en dwalen is voorspelbaar genoeg om te leren en
+gebruikt de RNG, zodat determinisme (M4) echt iets bewijst. Een doeltegel blokkeren
+voorkomt dat de vijand het doel bezet houdt, want bewegen in een vijand is aanvallen en
+de speler zou het doel dan niet kunnen betreden. Pathfinding (BFS) is bewust niet gedaan:
+de vijand kan achter een muur blijven hangen; dat is voor nu acceptabel en past bij
+"klein beginnen" (B7).
 
 ---
 

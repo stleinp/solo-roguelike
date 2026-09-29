@@ -6,6 +6,7 @@
 #include <string_view>
 #include <vector>
 
+#include "sim/rng.hpp"
 #include "sim/types.hpp"
 
 namespace sim {
@@ -26,7 +27,7 @@ struct State {
     int enemy_hp = kEnemyStartHp;
 
     int turn = 0;
-    std::array<std::uint64_t, 4> rng_state{};  // filled in by the RNG in M3
+    RngState rng_state{};
 
     Tile tile_at(Pos p) const { return tiles[static_cast<std::size_t>(p.y * width + p.x)]; }
     bool enemy_alive() const { return enemy_hp > 0; }
@@ -37,6 +38,7 @@ struct State {
 //   '#' wall   '.' floor   '>' goal   '@' player start   'E' enemy start
 // Player and enemy start tiles become floor. Requires rectangular rows, exactly one '@',
 // exactly one 'E' and at least one '>'. Returns nullopt otherwise.
-std::optional<State> parse_map(std::string_view text);
+// The seed initialises the RNG: same map + same seed + same actions = same game.
+std::optional<State> parse_map(std::string_view text, std::uint64_t seed = 0);
 
 }  // namespace sim

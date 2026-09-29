@@ -42,8 +42,8 @@ losse projecten — het één volgt uit het ander.
 
 ## Status
 
-**Fase 1 — M0, M1 en M2 afgerond.** `sim` bevat `State`, `parse_map` en `step()`;
-tests slagen in Debug (ASan/UBSan). Volgende: M3 (RNG en vijand).
+**Fase 1 — M0 t/m M3 afgerond.** `sim` bevat `State`, `parse_map`, `step()`, eigen RNG
+en een vijand; tests slagen in Debug (ASan/UBSan). Volgende: M4 (determinismetest).
 RL-stack beslist pas in fase 3.
 
 ## Documentatie
@@ -67,7 +67,7 @@ gooien; deze niet.
 
 ## Volgende stap
 
-Fase 1, mijlpaal **M3 — RNG en vijand**. Zie
+Fase 1, mijlpaal **M4 — determinismetest**. Zie
 [`projectplan.md`](projectplan.md#fase-1--deterministische-headless-kern).
 
 ## Werkregels

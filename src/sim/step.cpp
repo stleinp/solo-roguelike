@@ -36,8 +36,47 @@ void player_act(State& s, Action a) {
     }
 }
 
+bool enemy_can_enter(const State& s, Pos p) {
+    return s.in_bounds(p) && s.tile_at(p) == Tile::Floor && !(p == s.player);
+}
+
+void enemy_try_move(State& s, Pos d) {
+    const Pos target{s.enemy.x + d.x, s.enemy.y + d.y};
+    if (enemy_can_enter(s, target)) s.enemy = target;
+}
+
+int sign(int v) { return (v > 0) - (v < 0); }
+
+// Step along the axis with the larger distance (x on ties); if that is blocked, try the
+// other axis.
+void enemy_chase(State& s) {
+    const int dx = s.player.x - s.enemy.x;
+    const int dy = s.player.y - s.enemy.y;
+    const Pos along_x{sign(dx), 0};
+    const Pos along_y{0, sign(dy)};
+    const bool x_first = std::abs(dx) >= std::abs(dy);
+    const Pos first = x_first ? along_x : along_y;
+    const Pos second = x_first ? along_y : along_x;
+
+    const Pos before = s.enemy;
+    enemy_try_move(s, first);
+    if (s.enemy == before && (second.x != 0 || second.y != 0)) enemy_try_move(s, second);
+}
+
+void enemy_wander(State& s) {
+    static constexpr Pos kDirs[4] = {{0, -1}, {0, 1}, {-1, 0}, {1, 0}};
+    enemy_try_move(s, kDirs[range(s.rng_state, 4)]);
+}
+
 void enemy_act(State& s) {
-    if (s.enemy_alive() && adjacent(s.enemy, s.player)) s.player_hp -= kEnemyDamage;
+    if (!s.enemy_alive()) return;
+    if (adjacent(s.enemy, s.player)) {
+        s.player_hp -= kEnemyDamage;
+    } else if (range(s.rng_state, kEnemyWanderOdds) == 0) {
+        enemy_wander(s);
+    } else {
+        enemy_chase(s);
+    }
 }
 
 }  // namespace

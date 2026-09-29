@@ -25,9 +25,9 @@ een educatieve master — het doel is leren en technisch scherp blijven, niet om
 
 ## Status
 
-- **Fase 0 (planning), M0, M1 en M2 (`step()`): afgerond.** Toolchain
+- **Fase 0 (planning), M0 t/m M3 (RNG en vijand): afgerond.** Toolchain
   aanwezig; `cmake --preset debug && cmake --build --preset debug && ctest --preset debug`.
-- **Volgende stap: M3 — RNG en vijand.** Zie `docs/projectplan.md` (sectie "Mijlpalen fase 1").
+- **Volgende stap: M4 — determinismetest.** Zie `docs/projectplan.md` (sectie "Mijlpalen fase 1").
 - Laatste stand altijd in `docs/devlog.md` (nieuwste bovenaan).
 
 ## Omgeving
