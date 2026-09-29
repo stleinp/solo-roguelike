@@ -124,6 +124,22 @@ cmake --build --preset release
 
 `build/` staat in `.gitignore`.
 
+### Grafische frontend (fase 2b, B23)
+
+`delve_gfx` gebruikt raylib 5.5, dat CMake zelf ophaalt (`FetchContent`; de eerste
+configure duurt ~45 s). Raylib bouwt GLFW met X11-ondersteuning, dus eenmalig nodig:
+
+```bash
+sudo apt install -y libxrandr-dev libxinerama-dev libxcursor-dev libxi-dev libxkbcommon-dev
+```
+
+Zonder die pakketten: `cmake --preset debug -DDELVE_BUILD_GFX=OFF`; de rest bouwt dan
+gewoon. Starten: `./build/debug/src/game/delve_gfx [seed]`.
+
+Getest in WSL2 met WSLg: het venster opent via X11 (`DISPLAY=:0`). Het OpenGL-device is
+`llvmpipe` (Mesa, software-rendering), dus zonder GPU-versnelling. Voor 2D-tiles is dat
+ruim genoeg; houd het in het oog bij animatie of een eventuele 3D-weergave.
+
 ---
 
 ## Later: Python en CUDA (fase 3)

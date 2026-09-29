@@ -1,7 +1,7 @@
 # Projectplan
 
-Status: **fase 0 — planning, afgerond** · volgende: fase 1, mijlpaal M0
-Laatst bijgewerkt: 29 september 2026
+Status: **fase 0 t/m 2b afgerond** (playtest geslaagd) · volgende: fase 3, begin met O2 (RL-stack)
+Laatst bijgewerkt: 29 september 2026 (fase 2b afgerond, B24)
 
 ---
 
@@ -32,14 +32,17 @@ er onderweg dingen geleerd zijn die niet uit een tutorial komen.
 ### Binnen scope
 
 - Turn-based, grid-based roguelike
-- ASCII of eenvoudige tiles (geen art-pijplijn, geen artiest nodig)
+- ASCII in de terminal en 2D-tiles in een venster (geen art-pijplijn, geen artiest
+  nodig: gratis CC0-assets)
 - Single player, single agent
 - Volledig observeerbaar in de eerste versies
 - Kleine actieruimte: vier richtingen, aanvallen, wachten
 
 ### Buiten scope (voorlopig)
 
-- Real-time gameplay, 3D, physics
+- Real-time gameplay, physics, en een 3D-*simulatie* (z-as, verdiepingen). Een
+  3D-*weergave* van de 2D-simulatie is bewust uitgesteld, niet uitgesloten (zie
+  [B24](beslissingen.md)).
 - Fog of war / partiële observeerbaarheid — dwingt naar recurrente policies en maakt
   training aanzienlijk moeilijker
 - Inventaris, items, magie — blaast de actieruimte op
@@ -119,6 +122,7 @@ leg vast in `beslissingen.md`.
 CMakeLists.txt
 src/sim/        → library "sim": spelregels, state, RNG. Geen I/O, linkt tegen niets.
 src/game/       → fase 2: renderer + input + main loop, linkt tegen sim
+                  fase 2b: grafische frontend `delve_gfx` (raylib), assets in assets/
 tools/bench/    → benchmark (steps/s), linkt tegen sim
 tests/          → doctest-tests, linken tegen sim
 python/         → fase 3: binding + training
@@ -149,6 +153,48 @@ architectuurdruk.
 
 **Dit is de eerste mijlpaal die telt.** Vanaf hier heb je iets te tonen, ook als het
 project daarna stilvalt.
+
+---
+
+### Fase 2b — Grafische weergave (2D-tiles) — afgerond
+
+**Status:** G0–G3 zijn af binnen de tijdsbox, playtest geslaagd. Het 3D-beslispunt is
+genomen als [B24](beslissingen.md): 3D nu niet, wel als mogelijke toekomst.
+
+**Duur:** ~3 weken (~20 uur), vaste tijdsbox · beslist in [B23](beslissingen.md)
+
+Een tweede frontend naast de terminal, met raylib. De simulatie verandert niet. Dit is
+een uitbreiding op fase 2, gevraagd door de gebruiker, en komt vóór fase 3 zodat de
+trainingsfase een mooie viewer heeft.
+
+**Deliverables**
+- `delve_gfx`: een venster met tiles, HUD en beurtanimatie
+- Assets uit een CC0-set, met licentie in de repo
+- Een beslissing (B24) over 3D-weergave: uitgesteld, met een schets van de overgang
+
+**Klaar wanneer** iemand het zonder uitleg kan spelen in een venster én de tijdsbox
+gehaald is. Ook bij een gesneden G2 telt de fase als af.
+
+| # | Mijlpaal | Klaar wanneer |
+|---|---|---|
+| **G0** | **Venster** | raylib via `FetchContent`; `delve_gfx` opent in WSLg een venster, tekent de kaart als gekleurde vakjes en bestuurt de speler met dezelfde toetsen. `sim`, `bench` en `tests` linken niet tegen raylib. Als WSLg niet werkt, is dat hier het moment om het te weten. |
+| **G1** | **Tiles en HUD** | CC0-tilesheet voor muur, vloer, speler, vijand en doel; HUD met HP, beurt en seed; eindscherm voor winst, verlies en timeout; herstart. Pure functie tegel → schermpositie heeft tests. |
+| **G2** | **Beurtanimatie** | Speler en vijand glijden naar hun nieuwe tegel, met een korte flits bij een treffer. Floats alleen in de view-state. Invoer tijdens een animatie wordt gebufferd (één toets). **Snijkandidaat** als de tijd op is. Gehaald. |
+| **G3** | **Afronden en 3D-beslispunt** | Playtest door iemand anders, devlog, docs bijgewerkt. Daarna beslissen over 3D-weergave als B24, met de ervaring uit G0–G2. Gehaald: 3D uitgesteld. |
+
+**Wat je leert:** game loop met een vaste tick voor de simulatie en een variabele voor
+de weergave, scheiding van simulatie- en weergavetijd, resources laden, een grafische
+bibliotheek integreren via CMake.
+
+**Risico's**
+- *Scope-creep.* Grafisch werk heeft geen natuurlijk einde. De tijdsbox is de rem. Meer
+  graphics dan spelinhoud is het signaal om te stoppen.
+- *Asset-pijplijn.* Een tilesheet en een paar `LoadTexture`-aanroepen; niets algemeens.
+- *WSLg.* Vensters, GPU-acceleratie en toetsen kunnen bijzonderheden hebben. Dit wordt in
+  G0 getest, niet later.
+- *Twee frontends onderhouden.* De terminalversie mag achterlopen, maar moet blijven
+  bouwen. Het spel-`main` deelt geen logica die dubbel moet: keuze van toets naar actie
+  en het level horen in `game`, niet in beide frontends.
 
 ---
 
@@ -233,6 +279,8 @@ Pas relevant als fase 5 draait. Mogelijke richtingen:
   regressietest op balans
 - Pas hier: geleerde vijanden of self-play, als experiment en niet als fundament
 - Visualisatie van het leerproces (uitstekend lesmateriaal)
+- Een 3D-weergave van de 2D-simulatie (zie [B24](beslissingen.md) voor de schets: eerst een
+  spike van 2–3 uur in een aparte executable; simulatie en RL blijven ongewijzigd)
 - Eigen PPO-implementatie ter vervanging van de bibliotheek, puur om te begrijpen
 
 ---

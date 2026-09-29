@@ -28,7 +28,8 @@ losse projecten — het één volgt uit het ander.
 ## Wat het wordt
 
 - Een deterministische, headless simuleerbare roguelike-kern (grid, turn-based)
-- Een speelbare game daarbovenop, met eigen renderer en input
+- Een speelbare game daarbovenop, met eigen renderer en input (terminal, daarna een
+  2D-venster)
 - Een trainbare environment-binding voor RL
 - Een agent die levels betrouwbaar uitspeelt
 - Procedurele generatie, met de agent als automatische playtester
@@ -36,16 +37,19 @@ losse projecten — het één volgt uit het ander.
 ## Wat het (voorlopig) niet wordt
 
 - Geen algemene, herbruikbare engine. Dit is *deze game's* engine.
-- Geen real-time actie, geen 3D, geen fog of war in de eerste versies.
+- Geen real-time actie, geen 3D-simulatie, geen fog of war in de eerste versies. Een
+  3D-*weergave* van de 2D-simulatie is uitgesteld tot later, zie B24.
 - Geen RL-getrainde vijanden als fundament. Zie [beslissing B8](beslissingen.md#b8--agents-zijn-meetinstrument-geen-tegenstander).
 - Geen commercieel product.
 
 ## Status
 
-**Fase 1 afgerond (M0 t/m M5).** Deterministische headless kern met `step()`, eigen RNG,
-vijand, state-hash, determinismetest en benchmark (~49 miljoen steps/s, Release,
-één thread). Volgende: fase 2, speelbaar maken.
-RL-stack beslist pas in fase 3.
+**Fase 1, 2 en 2b zijn afgerond; playtests geslaagd. Volgende: fase 3 (RL-omgeving).**
+Deterministische headless kern met `step()`, eigen RNG, vijand, state-hash,
+determinismetest en benchmark (~49 miljoen steps/s, Release, één thread), plus een
+speelbare terminalversie (`delve`) en een grafische 2D-versie met tiles, HUD en
+beurtanimatie (`delve_gfx`, raylib, B23). 3D-weergave is uitgesteld maar niet uitgesloten
+(B24). RL-stack beslist pas in fase 3.
 
 ## Documentatie
 
@@ -66,10 +70,18 @@ Als rendering in de game logic verweven raakt, kan er in fase 3 niet meer headle
 getraind worden zonder alles te herschrijven. Alle andere keuzes zijn later nog om te
 gooien; deze niet.
 
+## Spelen
+
+```bash
+cmake --preset release && cmake --build --preset release
+./build/release/src/game/delve          # of: delve <seed> om een spel te herhalen
+```
+
 ## Volgende stap
 
-Fase 2 — speelbaar maken; begin met O3 (rendering) te beslissen. Zie
-[`projectplan.md`](projectplan.md#fase-1--deterministische-headless-kern).
+Fase 3 ([projectplan](projectplan.md#fase-3--trainbare-environment-en-eerste-agent)):
+begin met O2, de keuze van de RL-stack, en de binding van `sim` naar Python. Eerst
+overleggen en klein beginnen: één omgeving, één kaart.
 
 ## Werkregels
 

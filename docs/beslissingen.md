@@ -4,7 +4,7 @@ Elke beslissing met de reden erbij, zodat later-jij weet waarom iets zo is en ni
 opnieuw dezelfde discussie voert. Beslissingen mogen omgegooid worden — noteer dan
 waarom.
 
-Laatst bijgewerkt: 29 september 2026
+Laatst bijgewerkt: 29 september 2026 (B24)
 
 ---
 
@@ -386,6 +386,130 @@ regels uitbreiden.
 
 ---
 
+### B22 — Rendering: ruwe terminal met ANSI, zonder bibliotheek (was O3)
+
+**Beslissing:** de game tekent in de terminal met ANSI-escapecodes en leest toetsen via
+`termios` (raw mode, alternate screen). Geen ncurses, SDL of raylib. Structuur in
+`src/game/`:
+- `render.hpp/.cpp` — `render(State, seed, color)` levert tekst op; een pure functie,
+  dus testbaar zonder terminal.
+- `terminal.hpp/.cpp` — RAII-klasse die raw mode aan- en uitzet en toetsen vertaalt.
+- `main.cpp` — de lus: tekenen, toets lezen, `step()`.
+`sim` weet niets van dit alles (B5); de afhankelijkheid loopt `game → sim`.
+
+**Waarom:** het doel van fase 2 is dat iemand anders het kan opstarten zonder uitleg,
+dus geen extra pakketten om te installeren. Dat het in WSL, Linux en macOS werkt is
+genoeg. Rendering is hier een middel, geen leerdoel (zie de afweging bij O3); een
+grafische renderer kan in fase 6. Ncurses was overkill voor een kaartje van 11×7.
+
+**Details:** Ctrl-C wordt als toets (Quit) gelezen in plaats van als signaal, zodat de
+destructor de terminal altijd herstelt. `delve <seed>` speelt een specifiek spel opnieuw;
+de seed staat in beeld. De seed komt uit de klok: dat mag in `game`, niet in `sim`.
+Zonder terminal (pipe) stopt het programma met een melding.
+
+**Beperking:** Windows-native wordt niet ondersteund (termios); in WSL werkt het.
+
+**Aangepast door B23:** de opmerking "een grafische renderer kan in fase 6" is achterhaald;
+een 2D-grafische frontend komt vóór fase 3 (fase 2b). De terminalversie blijft bestaan.
+
+---
+
+### B23 — Grafische weergave: raylib, eerst 2D, 3D-beslissing later (fase 2b)
+
+**Beslissing:**
+- Vóór fase 3 komt een tijdsgebonden **fase 2b**: een 2D-grafische frontend met tiles,
+  als tweede executable naast de terminalversie (mijlpalen G0–G3, zie projectplan).
+- Bibliotheek: **raylib** (C, `FetchContent`, geen systeempakketten). Het venster draait
+  in WSL2 via WSLg.
+- De **simulatie blijft een 2D-integergrid.** Een 3D-simulatie (z-as, verdiepingen,
+  physics) blijft buiten scope.
+- **3D als weergave** van dezelfde 2D-`State` (blokken als muren, camera) is een optie
+  na G3. Die keuze wordt pas genomen als de 2D-versie er staat (B24, nog te maken).
+- Timebox: ongeveer 3 weken (~20 uur). Is G3 dan niet af, dan wordt de scope gesneden
+  en niet de tijd verlengd. Fase 3 wacht niet langer.
+
+**Waarom:**
+- Het is een wens van de gebruiker en motivatie is de schaarse grondstof (B2). Door B5
+  en B22 kost een tweede frontend geen aanpassing aan `sim`.
+- raylib heeft dezelfde API voor 2D en 3D, dus de latere 3D-stap is een uitbreiding en
+  geen herbouw. Godot en Unity blijven uitgesloten (B3). SDL3 is een alternatief, maar
+  voor 3D moet je dan zelf OpenGL doen.
+- 2D eerst omdat de echte kost van 3D in assets zit (modellen, textures, animatie), niet
+  in code. Dat botst met "geen art-pijplijn" (B4). 2D-tiles uit een CC0-set (bijvoorbeeld
+  Kenney) lossen dat op.
+- Een tijdsbox omdat grafisch werk geen natuurlijk einde heeft en het huidige spel klein
+  is (één kaart, één vijand). Meer graphics dan inhoud is het waarschuwingssignaal.
+- Bijkomend voordeel: Windows-native spelen wordt mogelijk (B22-beperking) en een viewer
+  is later herbruikbaar om de agent te laten zien (O7).
+
+**Regels:**
+1. raylib wordt alleen gelinkt door de grafische executable (`delve_gfx`). Nooit door
+   `sim`, `bench`, `tests` of de tekstrenderer.
+2. Floats en tijd zijn toegestaan in de weergavelaag (animatie), nooit in `sim` (B14).
+   De weergave houdt een eigen view-state bij; `sim::State` blijft de enige waarheid.
+3. Pure functies die zonder venster testbaar zijn (bijvoorbeeld tegel → schermpositie)
+   krijgen doctest-tests. Tekenen zelf niet.
+4. Assets komen in `assets/`, met de licentie van de bron erbij in de repo.
+5. Geen asset-pipeline, geen laadframework: een tilesheet en een paar `LoadTexture`-
+   aanroepen (projectregel 4).
+
+**Gevolg:** projectplan, README en CLAUDE.md zijn bijgewerkt. Fase 3 begint na G3.
+
+**Uitkomst:** G0–G3 zijn gehaald binnen de tijdsbox, G2 (beurtanimatie) inbegrepen. Zie
+B24 voor het vervolg.
+
+---
+
+### B24 — 3D-weergave: nu niet, wel als mogelijke toekomst (beslist bij G3)
+
+**Beslissing:** we blijven bij de 2D-tilefrontend (`delve_gfx`) en de terminalversie.
+Een 3D-weergave wordt **niet** gebouwd voor fase 3, maar blijft nadrukkelijk een
+mogelijke uitbreiding. De simulatie blijft in elk geval een 2D-integergrid.
+Beslist op 29 september 2026, na een geslaagde playtest van fase 2b.
+
+**Waarom nu niet:**
+- Fase 3 is de kern van het project en het leerdoel (B1). Meer weergavewerk vóór de
+  agent leert, verschuift het zwaartepunt.
+- 3D verandert het spel niet: er is geen hoogte in de simulatie. Het spel heeft één kaart
+  en één vijand, dus 3D toont weinig wat 2D niet ook toont (het waarschuwingssignaal
+  "meer graphics dan spelinhoud" uit B23).
+- De echte kost van 3D zit in assets (modellen, textures, animatie), niet in code.
+- In WSLg draait OpenGL hier op `llvmpipe` (software, zie `omgeving.md`). Voor 2D geen
+  probleem; voor 3D onbekend en nog te meten.
+- De 2D-versie voldoet aan de wens uit het begin: een grafische weergave die mooi genoeg is.
+
+**Als 3D later komt — hoe de overgang zou lopen** (een schets, geen belofte):
+- *Wanneer het de moeite waard wordt:* wanneer er inhoud is die 3D iets toevoegt, dus
+  grotere gegenereerde levels (fase 4), een agent die zichtbaar leert (fase 5–6, O7), of
+  simpelweg tijd en zin. Vroegste natuurlijke moment: na fase 3, uiterlijk fase 6.
+- *Eerste stap:* een spike van 2–3 uur in een aparte executable (bijvoorbeeld
+  `delve_gfx3d`): kubussen voor muren, een camera, licht, en spelers/vijanden als
+  eenvoudige vormen. Meten of dat op de beschikbare rendering vloeiend loopt, en
+  onderzoeken of WSL GPU-versnelling kan geven (nog niet getest).
+- *Wat hergebruikt wordt:* dezelfde `State`, `input`, `level`, en de pure delen van de
+  weergave (`anim`: `TurnDelta`, interpolatie, flits). Alleen het tekenen en de camera
+  zijn nieuw.
+- *Wat niet verandert:* `sim`, de determinismetest en de golden hash, de benchmark, de
+  RL-binding. 3D is weergave; agents merken er niets van.
+- *Assets:* eerst primitieven met kleur en licht (geen artiest nodig). Modellen pas als
+  het de moeite waard blijkt, met een CC0-bron zoals bij B23.
+- *Grens:* hoogte of een z-as **in de simulatie** is een aparte, veel zwaardere beslissing.
+  Ze verandert `State`, de observatie en de actieruimte (O4, B7) en hoort niet bij dit
+  besluit.
+
+**Regels om de weg open te houden (kosten niets):**
+1. Pure weergavelogica (positie, animatie, tegelnummers) blijft gescheiden van
+   raylib-tekencode, zoals nu in `layout` en `anim`.
+2. raylib blijft beperkt tot de grafische executables (B23, regel 1).
+3. Nieuwe spelmechanica wordt in `sim` ontworpen zonder aan een weergave te denken; de
+   weergave volgt de state en niet omgekeerd.
+
+**Heroverwegen wanneer:** fase 3 werkt en het project een visuele stap kan gebruiken, of
+wanneer een van de bovenstaande momenten zich voordoet. Bij een besluit: nieuwe B-nummer,
+met de meting van de spike erbij.
+
+---
+
 ## Nog open
 
 ### ~~O1 — Implementatietaal~~ → beslist, zie B10
@@ -427,15 +551,7 @@ PPO. Eigen implementatie kan later als fase 6.
 
 ---
 
-### O3 — Rendering
-
-**Kandidaten:** terminal/ASCII, raylib, SDL, of rechtstreeks een GPU-API zoals wgpu.
-
-**Afweging:** terminal is het snelst tot een speelbare build en volstaat volledig voor
-fase 2. Een echte renderer is leerzamer maar kan ook fase 6 zijn. Beslissing hangt af
-van of rendering een leerdoel is of een middel.
-
-**Te beslissen:** begin fase 2.
+### ~~O3 — Rendering~~ → beslist, zie B22
 
 ---
 

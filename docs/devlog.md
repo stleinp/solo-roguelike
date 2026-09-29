@@ -6,6 +6,117 @@ stilstand zonder aanloop verder kunnen, en expliciteren wat je geleerd hebt.
 
 ---
 
+## 29 september 2026 (sessie 3) — Playtest geslaagd; fase 2b gepland
+
+**Gedaan**
+- Playtest door iemand anders geslaagd: fase 2 is af.
+- Gevraagd: een mooiere grafische weergave en de vraag of 3D kan. Besloten (B23):
+  simulatie blijft 2D; eerst een 2D-tilefrontend met raylib als fase 2b (mijlpalen
+  G0–G3, ~3 weken tijdsbox), daarna beslissen over 3D-*weergave* (B24). Fase 3 volgt
+  na G3.
+- Docs bijgewerkt: `beslissingen.md` (B23, B22 aangepast), `projectplan.md` (fase 2b,
+  scope, repostructuur), `README.md`, `CLAUDE.md`. Geen code gewijzigd.
+
+**Geleerd / onthouden**
+- 3D is twee vragen: een 3D-weergave van een 2D-grid past in de architectuur, een
+  3D-simulatie niet. De echte kost van 3D zit in assets, niet in code.
+- Dankzij B5 kost een tweede frontend niets aan `sim`; dat betaalt zich nu terug.
+
+**G0 (venster) — af, door Stan visueel bevestigd**
+- `input.hpp/.cpp` (`Key`, `to_action`) en `level.hpp` (kaart, `clock_seed`) uit de
+  terminalversie gehaald, zodat beide frontends ze delen. `delve` gedrag ongewijzigd.
+- `src/game/gfx_main.cpp` → `delve_gfx`: gekleurde vakjes, HUD, zelfde toetsen (q sluit,
+  Escape niet). raylib 5.5 via `FetchContent`, alleen gelinkt aan `delve_gfx`;
+  optie `DELVE_BUILD_GFX` om het uit te zetten.
+- Bouwt zonder waarschuwingen in Debug (ASan/UBSan); 39 tests groen. Gestart in WSLg:
+  X11-venster, OpenGL 4.5 via `llvmpipe` (software), 60 fps-doel, geen crash.
+- `omgeving.md` bijgewerkt met de extra pakketten en WSLg-bevinding.
+
+**Geleerd / onthouden**
+- Raylib's GLFW vraagt `libxrandr-dev`, `libxinerama-dev`, `libxcursor-dev`, `libxi-dev`;
+  zonder die faalt de *configure*, niet de build. Daarom de optie.
+- WSLg geeft hier geen GPU-versnelling (`llvmpipe`). Voor 2D geen probleem.
+
+**G1 (tiles en HUD) — af, door Stan visueel bevestigd**
+- Assets: Kenney *Tiny Dungeon* (CC0, 16×16, packed sheet 12×11) in `assets/`, met
+  licentietekst en een `README.md` met de gebruikte tegelnummers. CMake kopieert
+  `assets/` bij het bouwen naast `delve_gfx`; het programma laadt via
+  `GetApplicationDirectory()`, dus de werkmap maakt niet uit.
+- `src/game/layout.hpp/.cpp`: pure functies (`sheet_rect`, `cell_rect`, `window_size`,
+  `sprite_index`) zonder raylib, in de `render`-library. 5 nieuwe doctests (44 totaal).
+- `gfx_main.cpp`: sprites (vloer eronder, karakters erbovenop), HUD met HP-balken
+  voor speler en vijand, beurt, seed en toetsen, en een eindscherm over de kaart
+  bij winst, verlies en timeout. Sprites 4× vergroot met point-filtering.
+
+**Geleerd / onthouden**
+- Zonder `unzip` en zonder PIL heb ik de sheet bekeken via een wegwerpprogrammaatje met
+  raylib zelf (`ImageResizeNN` + raster). Handig om tegelnummers te kiezen.
+- Tegel-indexen (muur 40, vloer 0, doel 45, speler 96, vijand 110) staan op één plek,
+  `layout.cpp`; wisselen van sprite is een getal veranderen.
+
+**G2 (beurtanimatie) — af, door Stan visueel bevestigd**
+- `src/game/anim.hpp/.cpp`: pure functies zonder raylib (`make_delta`, `ease_out`,
+  `lerp_cell`, `flash_strength`) met 6 doctests (50 totaal). Floats staan alleen hier
+  en in `gfx_main.cpp`, nooit in `sim`.
+- `gfx_main.cpp`: speler en vijand glijden 0,12 s naar hun nieuwe tegel; bij schade
+  flitst de getroffen sprite rood (0,2 s); een gedode vijand vervaagt tijdens de
+  beurt waarin hij sneuvelt. Het eindscherm verschijnt pas ná de laatste animatie.
+- Invoer: één toets wordt gebufferd terwijl een animatie loopt (een nieuwere vervangt
+  hem); `r` wist buffer en animatie. Zo gaan snelle toetsen niet verloren.
+- `State` en `sim` zijn niet aangeraakt: de state bevat direct het resultaat, de
+  animatie is alleen weergave (`TurnDelta` + timer).
+
+**Geleerd / onthouden**
+- `IsKeyPressed` levert een toets één keer; wie invoer tijdens de animatie negeert,
+  verliest toetsen. Daarom de buffer van één.
+- De HUD loopt een animatie voor (HP springt direct); voor nu bewust zo gelaten.
+- Bump-to-attack heeft geen beweging, dus geen uitval-animatie; alleen de flits.
+
+**G3 (afronden en 3D-beslispunt) — af**
+- Playtest van de grafische versie geslaagd. Fase 2b is af, binnen de tijdsbox.
+- B24: **3D nu niet, wel als mogelijke toekomst.** Redenen: fase 3 is de kern, 3D voegt
+  bij één kaart en één vijand weinig toe, de kost zit in assets, en WSLg draait op
+  `llvmpipe`. In B24 staat een schets van de overgang (spike van 2–3 uur in een aparte
+  executable, wat hergebruikt wordt, wat niet verandert) en een heroverwegingsmoment
+  (na fase 3, uiterlijk fase 6). Ook toegevoegd aan de lijst van fase 6.
+- Docs bijgewerkt: `beslissingen.md` (B24), `projectplan.md`, `README.md`, `CLAUDE.md`.
+
+**Geleerd / onthouden**
+- Een tijdsbox werkte: G0–G2 in één sessie-reeks, geen scope-creep, en een expliciete
+  beslissing over 3D in plaats van dat het stilletjes aansleept.
+- Doordat `sim` nooit iets van weergave wist (B5), kostte een tweede frontend niets aan
+  de kern, en zou een derde (3D) dat ook niet doen.
+
+**Volgende:** fase 3. Begin met O2 (RL-stack): overleggen, klein beginnen, één omgeving,
+één kaart. Nog niets gecommit sinds de laatste commit; het werk van fase 2 en 2b staat in
+de werkboom.
+
+---
+
+## 29 september 2026 (sessie 2, vervolg) — Fase 2: speelbare terminalversie
+
+**Gedaan**
+- O3 beslist: ruwe ANSI/termios, geen bibliotheek (B22).
+- `src/game/`: `render` (pure functie State → tekst, met/zonder kleur), `Terminal`
+  (RAII raw mode + alternate screen, pijltjes/wasd/hjkl/spatie/r/q) en `main.cpp`
+  (`delve [seed]`). Eén vaste level; `r` start een nieuw spel met een afgeleide seed.
+- 5 renderertests (39 in totaal). Het programma zelf getest via een pseudo-terminal:
+  starten, toetsen sturen, tussenstand lezen, afsluiten; de terminal wordt netjes
+  hersteld. Zonder terminal geeft het een duidelijke melding.
+
+**Geleerd / onthouden**
+- `render` als pure functie maakt de UI testbaar zonder terminal; alleen de dunne
+  `Terminal`-laag raakt het OS.
+- Ctrl-C als toets lezen (ISIG uit) garandeert dat de destructor de terminal herstelt.
+- De klok mag in `game` (seed), niet in `sim`. Layering werkt: `sim` is niet aangeraakt.
+
+**Nog te doen voor "klaar" van fase 2:** iemand anders laten spelen zonder uitleg en
+noteren waar die vastloopt. Ik heb zelf alleen via een pty getest, niet als mens.
+
+**Volgende:** playtest afronden; daarna fase 3 (O2 RL-stack).
+
+---
+
 ## 29 september 2026 (sessie 2, vervolg) — M5 benchmark af, fase 1 klaar
 
 **Gedaan**
